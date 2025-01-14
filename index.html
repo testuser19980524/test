@@ -27,9 +27,10 @@ function drawTriangle() {
   const bc = parseFloat(document.getElementById("sideBC").value);
   const ca = parseFloat(document.getElementById("sideCA").value);
 
-  // Basic error checking (improve this for robustness)
-  if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 || ab + bc <= ca || ab + ca <= bc || bc + ca <= ab) {
-    alert("Invalid side lengths. Please enter positive numbers that satisfy the triangle inequality.");
+  // Improved error checking: Triangle Inequality Theorem
+  if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 ||
+      (ab + bc <= ca) || (ab + ca <= bc) || (bc + ca <= ab)) {
+    alert("Invalid side lengths. Please enter positive numbers that satisfy the triangle inequality (sum of any two sides must be greater than the third side).");
     return;
   }
 
@@ -45,7 +46,7 @@ function drawTriangle() {
   ctx.closePath();
   ctx.stroke();
 
-  // (Angle calculation and display omitted for brevity.  This would need significant work to relate to the simplified drawing.)
+  // (Angle calculation and display omitted for brevity.)
 }
 </script>
 
