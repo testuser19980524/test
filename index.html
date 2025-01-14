@@ -8,7 +8,7 @@
     body { font-family: sans-serif; }
     #container { display: flex; }
     #canvasContainer { width: 600px; height: 500px; }
-    .calculator { width: 200px; margin-left: 20px; border: 1px solid #ccc; padding: 10px; }
+    .calculator { width: 200px; margin-right: 20px; border: 1px solid #ccc; padding: 10px; }
     .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
     .calculatorButton:hover { background-color: #ddd; }
     #calculatorDisplay { width: 180px; height: 30px; border: 1px solid #ccc; text-align: right; padding: 5px; font-size: 18px; margin-bottom: 10px; }
@@ -21,7 +21,6 @@
 </head>
 <body>
   <div id="container">
-    <div id="canvasContainer"></div>
     <div class="calculator">
       <div id="calculatorDisplay">0</div>
       <div class="calculator-row">
@@ -49,6 +48,7 @@
       </div>
       <button class="calculatorButton" id="clearButton">C</button>
     </div>
+    <div id="canvasContainer"></div>
   </div>
 
   <div id="input-section">
