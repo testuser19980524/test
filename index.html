@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>動的三角形と計算機</title>
+  <title>Dynamic Triangle with Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
   <style>
-    #container { display: flex; }
-    #canvasContainer { width: 300px; height: 300px; margin-right: 20px; }
-    #right-aligned-section {
-      display: flex;
-      justify-content: flex-end;
-      width: 500px;
-    }
-    #inputArea { width: 250px; margin-right: 20px; text-align: right; }
-    .calculator { width: 200px; border: 1px solid #ccc; padding: 10px; }
+    #canvasContainer { width: 600px; height: 500px; }
+    .calculator { width: 200px; position: absolute; top: 20px; right: 20px; border: 1px solid #ccc; padding: 10px; }
     .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
     .calculatorButton:hover { background-color: #ddd; }
     #calculatorDisplay { width: 180px; height: 30px; border: 1px solid #ccc; text-align: right; padding: 5px; font-size: 18px; margin-bottom: 10px; }
@@ -22,48 +15,45 @@
     label { display: block; margin-bottom: 5px; }
     .calculator-row { display: flex; }
     input[type="number"] { width: 80px; }
+    #inputFields { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <div id="container">
-    <div id="canvasContainer"></div>
-    <div id="right-aligned-section">
-      <div id="inputArea">
-        <label for="sideAB">辺AB:</label> <input type="number" id="sideAB" value="100"><br>
-        <label for="sideBC">辺BC:</label> <input type="number" id="sideBC" value="100"><br>
-        <label for="sideCA">辺CA:</label> <input type="number" id="sideCA" value="100"><br>
-        <label for="angleA">∠A (度):</label> <input type="number" id="angleA" value="0"><br>
-        <label for="scale">倍率:</label> <input type="number" id="scale" value="3.5" min="0.1" step="0.1"><br>
-      </div>
-      <div class="calculator">
-        <div id="calculatorDisplay">0</div>
-        <div class="calculator-row">
-          <button class="calculatorButton">7</button>
-          <button class="calculatorButton">8</button>
-          <button class="calculatorButton">9</button>
-          <button class="calculatorButton">×</button>
-        </div>
-        <div class="calculator-row">
-          <button class="calculatorButton">4</button>
-          <button class="calculatorButton">5</button>
-          <button class="calculatorButton">6</button>
-          <button class="calculatorButton">-</button>
-        </div>
-        <div class="calculator-row">
-          <button class="calculatorButton">1</button>
-          <button class="calculatorButton">2</button>
-          <button class="calculatorButton">3</button>
-          <button class="calculatorButton">+</button>
-        </div>
-        <div class="calculator-row">
-          <button class="calculatorButton">0</button>
-          <button class="calculatorButton">.</button>
-          <button class="calculatorButton">÷</button>
-          <button class="calculatorButton">=</button>
-        </div>
-        <button class="calculatorButton" id="clearButton">C</button>
-      </div>
+  <div id="canvasContainer"></div>
+  <div id="inputFields">
+    <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
+    <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
+    <label for="sideCA">CA:</label> <input type="number" id="sideCA" value="100"><br>
+    <label for="angleA">Angle A (degrees):</label> <input type="number" id="angleA" value="0"><br>
+    <label for="scale">Scale Factor:</label> <input type="number" id="scale" value="3.5" min="0.1" step="0.1"><br>
+  </div>
+  <div class="calculator">
+    <div id="calculatorDisplay">0</div>
+    <div class="calculator-row">
+      <button class="calculatorButton">7</button>
+      <button class="calculatorButton">8</button>
+      <button class="calculatorButton">9</button>
+      <button class="calculatorButton">×</button>
     </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">4</button>
+      <button class="calculatorButton">5</button>
+      <button class="calculatorButton">6</button>
+      <button class="calculatorButton">-</button>
+    </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">1</button>
+      <button class="calculatorButton">2</button>
+      <button class="calculatorButton">3</button>
+      <button class="calculatorButton">+</button>
+    </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">0</button>
+      <button class="calculatorButton">.</button>
+      <button class="calculatorButton">÷</button>
+      <button class="calculatorButton">=</button>
+    </div>
+    <button class="calculatorButton" id="clearButton">C</button>
   </div>
 
   <script>
@@ -73,7 +63,7 @@
     let displayValue = '0';
 
     function setup() {
-      let canvas = createCanvas(300, 300);
+      let canvas = createCanvas(600, 500);
       canvas.parent('canvasContainer');
       centerX = width / 2;
       centerY = height / 2;
@@ -136,8 +126,8 @@
     function draw() {
       background(220);
 
-      if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 || (ab + bc <= ca) || (ab + ca <= bc) || (bc + ca <= ab)) {
-        text("無効な入力です。辺の長さを確認してください。", 20, 20);
+      if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 || !isValidTriangle(ab, bc, ca)) {
+        text("Invalid input. Check side lengths.", 20, 20);
         return;
       }
 
@@ -165,6 +155,10 @@
       text("B: " + angleB.toFixed(2) + "°", rotatedB.x + centerX - offset, rotatedB.y + centerY + offset);
       text("C: " + angleC.toFixed(2) + "°", rotatedC.x + centerX + offset, rotatedC.y + centerY + offset);
       pop();
+    }
+
+    function isValidTriangle(a, b, c) {
+      return (a + b > c) && (a + c > b) && (b + c > a);
     }
   </script>
 </body>
