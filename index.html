@@ -1,26 +1,39 @@
-      calculatorButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          let buttonValue = button.textContent;
-          if (buttonValue === '=') {
-            try {
-              // eval()をより安全な計算方法に置き換え
-              calculatorDisplay.textContent = calculate(calculatorDisplay.textContent);
-            } catch (error) {
-              calculatorDisplay.textContent = "Error";
-            }
-          } else if (buttonValue === 'C') {
-            calculatorDisplay.textContent = '0';
-          } else {
-            calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
-          }
-        });
-      });
+document.addEventListener('DOMContentLoaded', function() {
+  // Your calculator initialization code goes here.  This entire block, including the functions, should be inside this event listener.
 
-      function calculate(expression) {
-        expression = expression.replace('×', '*').replace('÷', '/'); // Unicode演算子を標準的なものに変更
+  let calculatorDisplay = document.getElementById('calculatorDisplay');
+  let calculatorButtons = document.querySelectorAll('.calculatorButton');
+  let clearButton = document.getElementById('clearButton');
+
+  calculatorButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      let buttonValue = button.textContent;
+      if (buttonValue === '=') {
         try {
-          return eval(expression); // まだeval()を使っているが、安全な数式に対してのみ
-        } catch (error){
-          return "Error";
+          calculatorDisplay.textContent = calculate(calculatorDisplay.textContent);
+        } catch (error) {
+          calculatorDisplay.textContent = "Error";
         }
+      } else if (buttonValue === 'C') {
+        calculatorDisplay.textContent = '0';
+      } else {
+        calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
       }
+    });
+  });
+
+  function calculate(expression) {
+    expression = expression.replace('×', '*').replace('÷', '/');
+    try {
+      return eval(expression);
+    } catch (error) {
+      return "Error";
+    }
+  }
+
+  clearButton.addEventListener('click', () => {
+    calculatorDisplay.textContent = '0';
+  });
+});
+
+//rest of your p5.js code like setup() and draw() should remain outside of this function
