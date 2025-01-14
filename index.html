@@ -5,22 +5,30 @@
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
   <style>
-    body { font-family: sans-serif; }
     #container { display: flex; }
+    #inputArea { width: 250px; margin-right: 20px; }
     #canvasContainer { width: 600px; height: 500px; }
-    .calculator { width: 200px; margin-right: 20px; border: 1px solid #ccc; padding: 10px; }
+    .calculator { width: 200px; border: 1px solid #ccc; padding: 10px; }
     .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
     .calculatorButton:hover { background-color: #ddd; }
     #calculatorDisplay { width: 180px; height: 30px; border: 1px solid #ccc; text-align: right; padding: 5px; font-size: 18px; margin-bottom: 10px; }
     #clearButton { width: 180px; }
+    body { font-family: sans-serif; }
     label { display: block; margin-bottom: 5px; }
     .calculator-row { display: flex; }
     input[type="number"] { width: 80px; }
-    #input-section { margin-top: 20px; }
   </style>
 </head>
 <body>
   <div id="container">
+    <div id="inputArea">
+      <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
+      <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
+      <label for="sideCA">CA:</label> <input type="number" id="sideCA" value="100"><br>
+      <label for="angleA">Angle A (degrees):</label> <input type="number" id="angleA" value="0"><br>
+      <label for="scale">Scale Factor:</label> <input type="number" id="scale" value="3.5" min="0.1" step="0.1"><br>
+    </div>
+    <div id="canvasContainer"></div>
     <div class="calculator">
       <div id="calculatorDisplay">0</div>
       <div class="calculator-row">
@@ -44,19 +52,11 @@
       <div class="calculator-row">
         <button class="calculatorButton">0</button>
         <button class="calculatorButton">.</button>
-        <button class="calculatorButton">÷</button> <button class="calculatorButton">=</button>
+        <button class="calculatorButton">÷</button>
+        <button class="calculatorButton">=</button>
       </div>
       <button class="calculatorButton" id="clearButton">C</button>
     </div>
-    <div id="canvasContainer"></div>
-  </div>
-
-  <div id="input-section">
-    <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
-    <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
-    <label for="sideCA">CA:</label> <input type="number" id="sideCA" value="100"><br>
-    <label for="angleA">Angle A (degrees):</label> <input type="number" id="angleA" value="0"><br>
-    <label for="scale">Scale Factor:</label> <input type="number" id="scale" value="3.5" min="0.1" step="0.1"><br>
   </div>
 
   <script>
@@ -76,12 +76,14 @@
       angleA_deg = 0;
       scaleValue = 3.5;
 
+      // Event listeners for input fields
       document.getElementById("sideAB").addEventListener("input", updateTriangle);
       document.getElementById("sideBC").addEventListener("input", updateTriangle);
       document.getElementById("sideCA").addEventListener("input", updateTriangle);
       document.getElementById("angleA").addEventListener("input", updateTriangle);
       document.getElementById("scale").addEventListener("input", updateTriangle);
 
+      // Calculator setup
       let calculatorDisplay = document.getElementById('calculatorDisplay');
       let calculatorButtons = document.querySelectorAll('.calculatorButton');
       let clearButton = document.getElementById('clearButton');
@@ -129,6 +131,7 @@
     function draw() {
       background(220);
 
+      //Improved input validation
       if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 || (ab + bc <= ca) || (ab + ca <= bc) || (bc + ca <= ab)) {
         text("Invalid input. Check side lengths.", 20, 20);
         return;
@@ -151,6 +154,7 @@
       let angleA = degrees(acos((sq(bc) + sq(ca) - sq(ab)) / (2 * bc * ca)));
       let angleB = degrees(acos((sq(ca) + sq(ab) - sq(bc)) / (2 * ca * ab)));
       let angleC = degrees(acos((sq(ab) + sq(bc) - sq(ca)) / (2 * ab * bc)));
+
 
       textSize(18);
       push();
