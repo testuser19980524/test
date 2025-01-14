@@ -5,50 +5,53 @@
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
   <style>
-    #canvasContainer { width: 600px; height: 500px; float: left; }
-    .calculator { width: 200px; float: left; margin-left: 20px; border: 1px solid #ccc; padding: 10px; }
+    body { font-family: sans-serif; }
+    #container { display: flex; }
+    #canvasContainer { width: 600px; height: 500px; }
+    .calculator { width: 200px; margin-left: 20px; border: 1px solid #ccc; padding: 10px; }
     .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
     .calculatorButton:hover { background-color: #ddd; }
     #calculatorDisplay { width: 180px; height: 30px; border: 1px solid #ccc; text-align: right; padding: 5px; font-size: 18px; margin-bottom: 10px; }
     #clearButton { width: 180px; }
-    body { font-family: sans-serif; }
     label { display: block; margin-bottom: 5px; }
     .calculator-row { display: flex; }
     input[type="number"] { width: 80px; }
+    #input-section { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <div id="canvasContainer"></div>
-
-  <div class="calculator">
-    <div id="calculatorDisplay">0</div>
-    <div class="calculator-row">
-      <button class="calculatorButton">7</button>
-      <button class="calculatorButton">8</button>
-      <button class="calculatorButton">9</button>
-      <button class="calculatorButton">×</button>
+  <div id="container">
+    <div id="canvasContainer"></div>
+    <div class="calculator">
+      <div id="calculatorDisplay">0</div>
+      <div class="calculator-row">
+        <button class="calculatorButton">7</button>
+        <button class="calculatorButton">8</button>
+        <button class="calculatorButton">9</button>
+        <button class="calculatorButton">×</button>
+      </div>
+      <div class="calculator-row">
+        <button class="calculatorButton">4</button>
+        <button class="calculatorButton">5</button>
+        <button class="calculatorButton">6</button>
+        <button class="calculatorButton">-</button>
+      </div>
+      <div class="calculator-row">
+        <button class="calculatorButton">1</button>
+        <button class="calculatorButton">2</button>
+        <button class="calculatorButton">3</button>
+        <button class="calculatorButton">+</button>
+      </div>
+      <div class="calculator-row">
+        <button class="calculatorButton">0</button>
+        <button class="calculatorButton">.</button>
+        <button class="calculatorButton">÷</button> <button class="calculatorButton">=</button>
+      </div>
+      <button class="calculatorButton" id="clearButton">C</button>
     </div>
-    <div class="calculator-row">
-      <button class="calculatorButton">4</button>
-      <button class="calculatorButton">5</button>
-      <button class="calculatorButton">6</button>
-      <button class="calculatorButton">-</button>
-    </div>
-    <div class="calculator-row">
-      <button class="calculatorButton">1</button>
-      <button class="calculatorButton">2</button>
-      <button class="calculatorButton">3</button>
-      <button class="calculatorButton">+</button>
-    </div>
-    <div class="calculator-row">
-      <button class="calculatorButton">0</button>
-      <button class="calculatorButton">.</button>
-      <button class="calculatorButton">÷</button> <button class="calculatorButton">=</button>
-    </div>
-    <button class="calculatorButton" id="clearButton">C</button>
   </div>
 
-  <div>
+  <div id="input-section">
     <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
     <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
     <label for="sideCA">CA:</label> <input type="number" id="sideCA" value="100"><br>
@@ -60,7 +63,7 @@
     let ab, bc, ca, angleA_deg, scaleValue;
     let offset = 20;
     let centerX, centerY;
-    let displayValue = '0'; // Initialize as string
+    let displayValue = '0';
 
     function setup() {
       let canvas = createCanvas(600, 500);
@@ -88,17 +91,16 @@
           let buttonValue = button.textContent;
           if (buttonValue === '=') {
             try {
-              // Replace × and ÷ with * and / for math.evaluate()
               let expression = calculatorDisplay.textContent.replace('×', '*').replace('÷', '/');
               displayValue = math.evaluate(expression);
               calculatorDisplay.textContent = displayValue;
             } catch (error) {
               calculatorDisplay.textContent = "Error";
-              displayValue = '0'; // Reset displayValue on error
+              displayValue = '0';
             }
           } else if (buttonValue === 'C') {
             calculatorDisplay.textContent = '0';
-            displayValue = '0'; // Reset displayValue
+            displayValue = '0';
           } else {
             calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
           }
@@ -107,7 +109,7 @@
 
       clearButton.addEventListener('click', () => {
         calculatorDisplay.textContent = '0';
-        displayValue = '0'; // Reset displayValue
+        displayValue = '0';
       });
     }
 
