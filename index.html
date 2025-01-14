@@ -1,39 +1,164 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Your calculator initialization code goes here  This entire block, including the functions, should be inside this event listener.
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Triangle with Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
+  <style>
+    #canvasContainer { width: 600px; height: 500px; float: left; }
+    .calculator { width: 200px; float: left; margin-left: 20px; border: 1px solid #ccc; padding: 10px; }
+    .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
+    .calculatorButton:hover { background-color: #ddd; }
+    #calculatorDisplay { width: 180px; height: 30px; border: 1px solid #ccc; text-align: right; padding: 5px; font-size: 18px; margin-bottom: 10px; }
+    #clearButton { width: 180px; }
+    body { font-family: sans-serif; }
+    label { display: block; margin-bottom: 5px; }
+    .calculator-row { display: flex; }
+    input[type="number"] { width: 80px; }
+  </style>
+</head>
+<body>
+  <div id="canvasContainer"></div>
+  <div class="calculator">
+    <div id="calculatorDisplay">0</div>
+    <div class="calculator-row">
+      <button class="calculatorButton">7</button>
+      <button class="calculatorButton">8</button>
+      <button class="calculatorButton">9</button>
+      <button class="calculatorButton">×</button>
+    </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">4</button>
+      <button class="calculatorButton">5</button>
+      <button class="calculatorButton">6</button>
+      <button class="calculatorButton">-</button>
+    </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">1</button>
+      <button class="calculatorButton">2</button>
+      <button class="calculatorButton">3</button>
+      <button class="calculatorButton">+</button>
+    </div>
+    <div class="calculator-row">
+      <button class="calculatorButton">0</button>
+      <button class="calculatorButton">.</button>
+      <button class="calculatorButton">=</button>
+      <button class="calculatorButton">÷</button>
+    </div>
+    <button class="calculatorButton" id="clearButton">C</button>
+  </div>
+  <div>
+    <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
+    <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
+    <label for="sideCA">CA:</label> <input type="number" id="sideCA" value="100"><br>
+    <label for="angleA">Angle A (degrees):</label> <input type="number" id="angleA" value="0"><br>
+    <label for="scale">Scale Factor:</label> <input type="number" id="scale" value="3.5" min="0.1" step="0.1"><br>
+  </div>
 
-  let calculatorDisplay = document.getElementById('calculatorDisplay');
-  let calculatorButtons = document.querySelectorAll('.calculatorButton');
-  let clearButton = document.getElementById('clearButton');
+  <script>
+    let ab, bc, ca, angleA_deg, scaleValue;
+    let offset = 20;
+    let centerX, centerY;
 
-  calculatorButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      let buttonValue = button.textContent;
-      if (buttonValue === '=') {
-        try {
-          calculatorDisplay.textContent = calculate(calculatorDisplay.textContent);
-        } catch (error) {
-          calculatorDisplay.textContent = "Error";
-        }
-      } else if (buttonValue === 'C') {
-        calculatorDisplay.textContent = '0';
-      } else {
-        calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
-      }
-    });
-  });
-
-  function calculate(expression) {
-    expression = expression.replace('×', '*').replace('÷', '/');
-    try {
-      return eval(expression);
-    } catch (error) {
-      return "Error";
+    function setup() {
+      let canvas = createCanvas(600, 500);
+      canvas.parent('canvasContainer');
+      centerX = width / 2;
+      centerY = height / 2;
+      ab = 100;
+      bc = 100;
+      ca = 100;
+      angleA_deg = 0;
+      scaleValue = 3.5;
+      document.getElementById("sideAB").addEventListener("input", updateTriangle);
+      document.getElementById("sideBC").addEventListener("input", updateTriangle);
+      document.getElementById("sideCA").addEventListener("input", updateTriangle);
+      document.getElementById("angleA").addEventListener("input", updateTriangle);
+      document.getElementById("scale").addEventListener("input", updateTriangle);
     }
-  }
 
-  clearButton.addEventListener('click', () => {
-    calculatorDisplay.textContent = '0';
-  });
-});
+    function draw() {
+      background(220);
 
-//rest of your p5.js code like setup() and draw() should remain outside of this function
+      if (isNaN(ab) || isNaN(bc) || isNaN(ca) || ab <= 0 || bc <= 0 || ca <= 0 || (ab + bc <= ca) || (ab + ca <= bc) || (bc + ca <= ab)) {
+        text("Invalid input. Check side lengths.", 20, 20);
+        return;
+      }
+
+      let angleA_rad = radians(angleA_deg);
+      let a = createVector(0, -(ca * scaleValue) / 2);
+      let b = createVector(-(ab * scaleValue) / 2, (ab * scaleValue * sqrt(3) / 4));
+      let c = createVector((bc * scaleValue) / 2, (bc * scaleValue * sqrt(3) / 4));
+
+      let rotatedA = a.copy().rotate(angleA_rad);
+      let rotatedB = b.copy().rotate(angleA_rad);
+      let rotatedC = c.copy().rotate(angleA_rad);
+
+      push();
+      translate(centerX, centerY);
+      triangle(rotatedA.x, rotatedA.y, rotatedB.x, rotatedB.y, rotatedC.x, rotatedC.y);
+      pop();
+
+      let angleA = degrees(acos((sq(bc) + sq(ca) - sq(ab)) / (2 * bc * ca)));
+      let angleB = degrees(acos((sq(ca) + sq(ab) - sq(bc)) / (2 * ca * ab)));
+      let angleC = degrees(acos((sq(ab) + sq(bc) - sq(ca)) / (2 * ab * bc)));
+
+      textSize(18);
+      push();
+      text("A: " + angleA.toFixed(2) + "°", rotatedA.x + centerX, rotatedA.y + centerY - offset);
+      text("B: " + angleB.toFixed(2) + "°", rotatedB.x + centerX - offset, rotatedB.y + centerY + offset);
+      text("C: " + angleC.toFixed(2) + "°", rotatedC.x + centerX + offset, rotatedC.y + centerY + offset);
+      pop();
+
+      function updateTriangle() {
+        ab = parseFloat(document.getElementById("sideAB").value) || 100;
+        bc = parseFloat(document.getElementById("sideBC").value) || 100;
+        ca = parseFloat(document.getElementById("sideCA").value) || 100;
+        angleA_deg = parseFloat(document.getElementById("angleA").value) || 0;
+        scaleValue = parseFloat(document.getElementById("scale").value) || 1;
+
+        if (isNaN(scaleValue) || scaleValue <= 0) {
+          scaleValue = 1;
+        }
+        redraw();
+      }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      let calculatorDisplay = document.getElementById('calculatorDisplay');
+      let calculatorButtons = document.querySelectorAll('.calculatorButton');
+      let clearButton = document.getElementById('clearButton');
+
+      calculatorButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          let buttonValue = button.textContent;
+          if (buttonValue === '=') {
+            try {
+              calculatorDisplay.textContent = calculate(calculatorDisplay.textContent);
+            } catch (error) {
+              calculatorDisplay.textContent = "Error";
+            }
+          } else if (buttonValue === 'C') {
+            calculatorDisplay.textContent = '0';
+          } else {
+            calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
+          }
+        });
+      });
+
+      function calculate(expression) {
+        expression = expression.replace('×', '*').replace('÷', '/');
+        try {
+          return eval(expression); // Still using eval(), but on a sanitized expression
+        } catch (error) {
+          return "Error";
+        }
+      }
+
+      clearButton.addEventListener('click', () => {
+        calculatorDisplay.textContent = '0';
+      });
+    });
+  </script>
+</body>
+</html>
