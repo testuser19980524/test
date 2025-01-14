@@ -3,7 +3,7 @@
 <head>
   <title>Dynamic Triangle with Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
-  <style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script> <style>
     #canvasContainer { width: 600px; height: 500px; float: left; }
     .calculator { width: 200px; float: left; margin-left: 20px; border: 1px solid #ccc; padding: 10px; }
     .calculatorButton { width: 40px; height: 40px; margin: 5px; border: 1px solid #ccc; background-color: #eee; cursor: pointer; }
@@ -13,11 +13,12 @@
     body { font-family: sans-serif; }
     label { display: block; margin-bottom: 5px; }
     .calculator-row { display: flex; }
-    input[type="number"] { width: 80px; }
+    input[type="number"] { width: 80px; } /*Added for better input field width */
   </style>
 </head>
 <body>
   <div id="canvasContainer"></div>
+
   <div class="calculator">
     <div id="calculatorDisplay">0</div>
     <div class="calculator-row">
@@ -41,11 +42,11 @@
     <div class="calculator-row">
       <button class="calculatorButton">0</button>
       <button class="calculatorButton">.</button>
-      <button class="calculatorButton">=</button>
-      <button class="calculatorButton">÷</button>
+      <button class="calculatorButton">÷</button> <button class="calculatorButton">=</button>
     </div>
     <button class="calculatorButton" id="clearButton">C</button>
   </div>
+
   <div>
     <label for="sideAB">AB:</label> <input type="number" id="sideAB" value="100"><br>
     <label for="sideBC">BC:</label> <input type="number" id="sideBC" value="100"><br>
@@ -58,6 +59,7 @@
     let ab, bc, ca, angleA_deg, scaleValue;
     let offset = 20;
     let centerX, centerY;
+    let displayValue = 0; // Initialize displayValue
 
     function setup() {
       let canvas = createCanvas(600, 500);
@@ -69,11 +71,57 @@
       ca = 100;
       angleA_deg = 0;
       scaleValue = 3.5;
+
+
+      // Event listeners added AFTER setup() to ensure elements exist.
       document.getElementById("sideAB").addEventListener("input", updateTriangle);
       document.getElementById("sideBC").addEventListener("input", updateTriangle);
       document.getElementById("sideCA").addEventListener("input", updateTriangle);
       document.getElementById("angleA").addEventListener("input", updateTriangle);
       document.getElementById("scale").addEventListener("input", updateTriangle);
+
+      let calculatorDisplay = document.getElementById('calculatorDisplay');
+      let calculatorButtons = document.querySelectorAll('.calculatorButton');
+      let clearButton = document.getElementById('clearButton');
+
+      calculatorButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          let buttonValue = button.textContent;
+          if (buttonValue === '=') {
+            try {
+              // Use mathjs to evaluate the expression safely
+              displayValue = math.evaluate(calculatorDisplay.textContent);
+              calculatorDisplay.textContent = displayValue;
+            } catch (error) {
+              calculatorDisplay.textContent = "Error";
+              displayValue = 0; // Reset displayValue on error
+            }
+          } else if (buttonValue === 'C') {
+            calculatorDisplay.textContent = '0';
+            displayValue = 0; // Reset displayValue
+          } else {
+            calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
+          }
+        });
+      });
+
+      clearButton.addEventListener('click', () => {
+        calculatorDisplay.textContent = '0';
+        displayValue = 0; // Reset displayValue
+      });
+    }
+
+    function updateTriangle() {
+      ab = parseFloat(document.getElementById("sideAB").value) || 100;
+      bc = parseFloat(document.getElementById("sideBC").value) || 100;
+      ca = parseFloat(document.getElementById("sideCA").value) || 100;
+      angleA_deg = parseFloat(document.getElementById("angleA").value) || 0;
+      scaleValue = parseFloat(document.getElementById("scale").value) || 1;
+
+      if (isNaN(scaleValue) || scaleValue <= 0) {
+        scaleValue = 1;
+      }
+      redraw();
     }
 
     function draw() {
@@ -108,57 +156,7 @@
       text("B: " + angleB.toFixed(2) + "°", rotatedB.x + centerX - offset, rotatedB.y + centerY + offset);
       text("C: " + angleC.toFixed(2) + "°", rotatedC.x + centerX + offset, rotatedC.y + centerY + offset);
       pop();
-
-      function updateTriangle() {
-        ab = parseFloat(document.getElementById("sideAB").value) || 100;
-        bc = parseFloat(document.getElementById("sideBC").value) || 100;
-        ca = parseFloat(document.getElementById("sideCA").value) || 100;
-        angleA_deg = parseFloat(document.getElementById("angleA").value) || 0;
-        scaleValue = parseFloat(document.getElementById("scale").value) || 1;
-
-        if (isNaN(scaleValue) || scaleValue <= 0) {
-          scaleValue = 1;
-        }
-        redraw();
-      }
     }
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-      let calculatorDisplay = document.getElementById('calculatorDisplay');
-      let calculatorButtons = document.querySelectorAll('.calculatorButton');
-      let clearButton = document.getElementById('clearButton');
-
-      calculatorButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          let buttonValue = button.textContent;
-          if (buttonValue === '=') {
-            try {
-              calculatorDisplay.textContent = calculate(calculatorDisplay.textContent);
-            } catch (error) {
-              calculatorDisplay.textContent = "Error";
-            }
-          } else if (buttonValue === 'C') {
-            calculatorDisplay.textContent = '0';
-          } else {
-            calculatorDisplay.textContent = (calculatorDisplay.textContent === '0') ? buttonValue : calculatorDisplay.textContent + buttonValue;
-          }
-        });
-      });
-
-      function calculate(expression) {
-        expression = expression.replace('×', '*').replace('÷', '/');
-        try {
-          return eval(expression); // Still using eval(), but on a sanitized expression
-        } catch (error) {
-          return "Error";
-        }
-      }
-
-      clearButton.addEventListener('click', () => {
-        calculatorDisplay.textContent = '0';
-      });
-    });
   </script>
 </body>
 </html>
